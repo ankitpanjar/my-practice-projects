@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+
+datasource db {
+  provider = "mysql"
+}
+
+model user_credentials {
+  id          Int    @id @default(autoincrement())
+  username    String  @unique
+  password    String?
+  refresh_token  String? @db.VarChar(500)
+
+  userInfo    user_info?
+}
+
+model user_info {
+  id       Int @id  @default(autoincrement())
+  credential_id  Int  @unique
+  name     String
+  is_primary  Boolean   @default(false)
+  mobile_number_code String?
+  mobile_number String?
+  image    String? @db.MediumText
+  designation_id  Int?
+  course_id       Int?
+
+  credential   user_credentials  @relation(fields: [credential_id] ,references: [id])
+  designation  designation?       @relation(fields: [designation_id],references: [id])
+  course       course?             @relation(fields: [course_id], references: [id])
+
+}
+
+model designation {
+   id          Int @id  @default(autoincrement())
+   name          String
+   description   String
+
+   user           user_info[]
+}
+
+model course {
+   id          Int @id  @default(autoincrement())
+   name          String
+   code          String
+   description   String
+
+   user          user_info[]
+}
